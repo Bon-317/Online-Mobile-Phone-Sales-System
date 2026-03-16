@@ -1,0 +1,31 @@
+﻿@model FSTORE.Forum.CommentTreeModel
+
+@foreach (var comment in Model.Comments)
+{
+    var role = await Model.UserService.GetUserRole(comment.AuthorEmail);
+    var label = Model.UserService.GetRoleLabel(role);
+    var color = Model.UserService.GetRoleColor(role);
+
+    <div style="margin-left:@(comment.ParentId != null ? "20px" : "0px")" class="mb-3 border-start ps-3">
+        <p>
+            <strong style="color:@color">[@label]</strong> @comment.AuthorEmail<br />
+            @comment.Content<br />
+            <small class="text-muted">(@comment.CreatedAt.ToDateTime().ToString("dd/MM/yyyy HH:mm"))</small>
+        </p>
+
+        @await Html.PartialAsync("_CommentForm", new FSTORE.Forum.CommentFormModel
+{
+    PostId = Model.PostId,
+    ParentId = comment.Id
+})
+
+        @if (comment.Children != null && comment.Children.Any())
+        {
+            @await Component.InvokeAsync("CommentTree", new
+                {
+                    comments = comment.Children,
+                    postId = Model.PostId
+                })
+        }
+    </div>
+}

@@ -1,0 +1,56 @@
+﻿@model FSTORE.Models.Product
+@{
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
+        Layout = "_AdminLayout";
+
+}
+
+<h2>🛠 Chỉnh sửa sản phẩm</h2>
+
+<form asp-action="SaveProduct" method="post">
+    <input type="hidden" name="ProductId" value="@Model.ProductId" />
+    <input type="hidden" name="Category" value="@Model.category" />
+
+    <div class="mb-3">
+        <label>Tên sản phẩm</label>
+        <input type="text" name="name" value="@Model.name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Giá</label>
+        <input type="number" name="price" value="@Model.price" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Tồn kho</label>
+        <input type="number" name="stock" value="@Model.stock" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>URL ảnh</label>
+        <input type="text" name="imageUrl" value="@Model.imageUrl" class="form-control" />
+        <img src="@Model.imageUrl" alt="Ảnh sản phẩm" width="120" class="mt-2" onerror="this.src='/images/default.png'" />
+    </div>
+
+    <div class="mb-3">
+        <label>Mô tả</label>
+        <textarea name="description" rows="5" class="form-control">@Model.description</textarea>
+    </div>
+
+    <h4 class="mt-4">📋 Thông số kỹ thuật</h4>
+
+    <div class="row">
+        <div class="col-md-4 mb-3"><label>Chipset</label><input name="chipset" value="@Model.chipset" class="form-control" /></div>
+        <div class="col-md-4 mb-3"><label>RAM</label><input name="ram" value="@Model.ram" class="form-control" /></div>
+        <div class="col-md-4 mb-3"><label>Bộ nhớ</label><input name="storage" value="@Model.storage" class="form-control" /></div>
+        <div class="col-md-4 mb-3"><label>Camera sau</label><input name="rearCamera" value="@Model.rearCamera" class="form-control" /></div>
+        <div class="col-md-4 mb-3"><label>Camera trước</label><input name="frontCamera" value="@Model.frontCamera" class="form-control" /></div>
+        <div class="col-md-4 mb-3"><label>Pin</label><input name="battery" value="@Model.battery" class="form-control" /></div>
+        <div class="col-md-4 mb-3"><label>Hệ điều hành</label><input name="os" value="@Model.os" class="form-control" /></div>
+        <div class="col-md-4 mb-3"><label>Kích thước màn hình</label><input name="screenSize" value="@Model.screenSize" class="form-control" /></div>
+        <div class="col-md-4 mb-3"><label>Độ phân giải</label><input name="resolution" value="@Model.resolution" class="form-control" /></div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">💾 Lưu</button>
+    <a href="/Admin/ProductsByCategory?category=@Model.category" class="btn btn-secondary mt-3">❌ Hủy</a>
+</form>

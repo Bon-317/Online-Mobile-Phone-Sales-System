@@ -1,0 +1,8 @@
+﻿@model int
+
+<a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index">
+    <i class="fas fa-shopping-cart"></i> Giỏ hàng
+    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle cart-badge">
+        @Model
+    </span>
+</a>

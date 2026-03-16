@@ -1,0 +1,680 @@
+﻿@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<style>
+    body {
+        padding-top: 70px !important;
+    }
+
+    .footer {
+        display: none !important;
+    }
+
+    main {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow-y: auto;
+        padding: 2rem 0;
+        margin: 0;
+    }
+
+    .video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        z-index: 0;
+    }
+
+    .video-background video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        min-width: 100%;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        z-index: 0;
+    }
+
+    .video-background::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1;
+    }
+
+    .signup-container {
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        padding: 2.5rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        width: 100%;
+        max-width: 450px;
+        position: relative;
+        z-index: 2;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        animation: fadeInUp 0.6s ease-out;
+        margin: auto;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .signup-container h2 {
+        color: rgba(255, 255, 255, 0.95);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-size: 1.8rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .panda-container {
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
+    }
+
+    .panda {
+        width: 160px;
+        height: 160px;
+        position: relative;
+    }
+
+    .panda-face {
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        border-radius: 50%;
+        position: relative;
+        border: 4px solid #2c3e50;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .ear {
+        width: 45px;
+        height: 45px;
+        background: #2c3e50;
+        border-radius: 50%;
+        position: absolute;
+        top: 8px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .ear.left {
+        left: 8px;
+    }
+
+    .ear.right {
+        right: 8px;
+    }
+
+    .eye-patch {
+        width: 50px;
+        height: 60px;
+        background: #2c3e50;
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        position: absolute;
+        top: 40px;
+    }
+
+    .eye-patch.left {
+        left: 22px;
+        transform: rotate(-10deg);
+    }
+
+    .eye-patch.right {
+        right: 22px;
+        transform: rotate(10deg);
+    }
+
+    .eye {
+        width: 18px;
+        height: 18px;
+        background: #fff;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .pupil {
+        width: 10px;
+        height: 10px;
+        background: #2c3e50;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.1s ease;
+    }
+
+    .panda-hand {
+        width: 55px;
+        height: 55px;
+        background: #2c3e50;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 10;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .panda-hand::after {
+        content: '';
+        width: 40px;
+        height: 40px;
+        background: #34495e;
+        border-radius: 50%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .panda-hand.left {
+        left: -25px;
+    }
+
+    .panda-hand.right {
+        right: -25px;
+    }
+
+    .panda-hand.typing {
+        opacity: 1;
+    }
+
+    .panda-hand.left.typing {
+        left: 15px;
+        animation: typeLeft 0.5s infinite;
+    }
+
+    .panda-hand.right.typing {
+        right: 15px;
+        animation: typeRight 0.5s infinite;
+    }
+
+    .panda-hand.cover-eyes {
+        opacity: 1;
+    }
+
+    .panda-hand.left.cover-eyes {
+        left: 15px;
+        animation: none;
+    }
+
+    .panda-hand.right.cover-eyes {
+        right: 15px;
+        animation: none;
+    }
+
+    @@keyframes typeLeft {
+        0%, 100% { transform: translateY(-50%) rotate(0deg); }
+        50% { transform: translateY(-45%) rotate(-5deg); }
+    }
+
+    @@keyframes typeRight {
+        0%, 100% { transform: translateY(-50%) rotate(0deg); }
+        50% { transform: translateY(-45%) rotate(5deg); }
+    }
+
+    .eye.closed {
+        height: 3px;
+        background: #2c3e50;
+        border-radius: 0;
+    }
+
+    .eye.closed .pupil {
+        display: none;
+    }
+
+    .nose {
+        width: 16px;
+        height: 13px;
+        background: #2c3e50;
+        border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+        position: absolute;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .mouth {
+        width: 35px;
+        height: 22px;
+        border: 3px solid #2c3e50;
+        border-top: none;
+        border-radius: 0 0 50% 50%;
+        position: absolute;
+        top: 93px;
+        left: 50%;
+        transform: translateX(-50%);
+        transition: all 0.3s ease;
+    }
+
+    .mouth.happy {
+        width: 40px;
+        height: 25px;
+    }
+
+    .signup-container form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+    }
+
+    .signup-container input {
+        padding: 0.75rem 1rem;
+        border: 2px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+    }
+
+    .signup-container input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .signup-container input:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .signup-container button {
+        padding: 0.85rem 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .signup-container button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .signup-container button:active {
+        transform: translateY(0);
+    }
+
+    #otp-section {
+        padding: 1rem;
+        background: rgba(255, 193, 7, 0.15);
+        border-left: 4px solid rgba(255, 193, 7, 0.8);
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        backdrop-filter: blur(10px);
+        animation: slideDown 0.4s ease-out;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    #otp-section input {
+        margin-bottom: 0.8rem;
+    }
+
+    #otp-section button {
+        margin-top: 0;
+    }
+
+    .text-danger {
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        text-align: center;
+        margin: 0;
+        padding: 0.75rem;
+        background-color: rgba(255, 107, 107, 0.2);
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .text-success {
+        color: #4ade80;
+        font-size: 0.9rem;
+        text-align: center;
+        padding: 0.75rem;
+        background-color: rgba(74, 222, 128, 0.2);
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        border: 1px solid rgba(74, 222, 128, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .signup-container p {
+        margin: 0.8rem 0 0 0;
+        text-align: center;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .signup-container a {
+        color: rgba(255, 255, 255, 0.95);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .signup-container a:hover {
+        color: #ffffff;
+        text-decoration: underline;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .signup-container .btn-link {
+        background: none;
+        border: none;
+        padding: 0;
+        color: rgba(255, 255, 255, 0.95);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .signup-container .btn-link:hover {
+        color: #ffffff;
+    }
+
+    @@media (max-width: 768px) {
+        body {
+            padding-top: 60px !important;
+        }
+
+        main {
+            top: 60px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .signup-container {
+            padding: 1.5rem;
+            margin: 1rem;
+            max-width: calc(100vw - 2rem);
+        }
+
+        .panda-container {
+            width: 140px;
+            height: 140px;
+            margin-bottom: 1rem;
+        }
+
+        .panda {
+            width: 130px;
+            height: 130px;
+        }
+
+        .signup-container h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .signup-container input {
+            padding: 0.65rem 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .signup-container button {
+            padding: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .signup-container p {
+            font-size: 0.85rem;
+        }
+
+        #otp-section {
+            padding: 0.8rem;
+            margin-top: 0.3rem;
+        }
+    }
+</style>
+
+<main>
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="~/videos/videoplayback.mp4" type="video/mp4" />
+        </video>
+    </div>
+
+    <div class="signup-container">
+        <h2>Đăng ký tài khoản</h2>
+
+        <!-- Panda Animation -->
+        <div class="panda-container">
+            <div class="panda">
+                <div class="panda-face">
+                    <div class="ear left"></div>
+                    <div class="ear right"></div>
+
+                    <div class="eye-patch left">
+                        <div class="eye left-eye">
+                            <div class="pupil left-pupil"></div>
+                        </div>
+                    </div>
+
+                    <div class="eye-patch right">
+                        <div class="eye right-eye">
+                            <div class="pupil right-pupil"></div>
+                        </div>
+                    </div>
+
+                    <div class="panda-hand left" id="leftHand"></div>
+                    <div class="panda-hand right" id="rightHand"></div>
+
+                    <div class="nose"></div>
+                    <div class="mouth" id="pandaMouth"></div>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" asp-controller="Auth" asp-action="Signup">
+            <input type="text" name="name" id="nameInput" placeholder="Họ tên" required />
+            <input type="text" name="address" id="addressInput" placeholder="Địa chỉ" required />
+            <input type="text" name="phone" id="phoneInput" placeholder="Số điện thoại" required />
+            <input type="email" name="email" id="emailInput" placeholder="Email" required />
+            <input type="password" name="password" id="passwordInput" placeholder="Mật khẩu" required />
+            <button type="button" id="send-otp-btn">Gửi mã OTP</button>
+            <div id="otp-section" style="display:none;">
+                <input type="text" name="otp" id="otpInput" placeholder="Nhập mã OTP" required />
+                <button type="submit">Xác nhận & Đăng ký</button>
+            </div>
+        </form>
+
+        @if (ViewBag.Error != null)
+        {
+            <p class="text-danger">@ViewBag.Error</p>
+        }
+
+        @if (ViewBag.Success != null)
+        {
+            <p class="text-success">@ViewBag.Success</p>
+        }
+
+        <p class="mt-3">
+            Đã có tài khoản?
+            <a asp-controller="Auth" asp-action="Login">Đăng nhập</a>
+        </p>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+<script>
+    emailjs.init("kezSu7ZgYe7uy12BJ");
+</script>
+<script src="/js/otp.js"></script>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const nameInput = document.getElementById('nameInput');
+            const addressInput = document.getElementById('addressInput');
+            const phoneInput = document.getElementById('phoneInput');
+            const emailInput = document.getElementById('emailInput');
+            const otpInput = document.getElementById('otpInput');
+            const passwordInput = document.getElementById('passwordInput');
+            
+            const inputs = [nameInput, addressInput, phoneInput, emailInput, otpInput].filter(i => i);
+            
+            const leftEye = document.querySelector('.left-eye');
+            const rightEye = document.querySelector('.right-eye');
+            const leftPupil = document.querySelector('.left-pupil');
+            const rightPupil = document.querySelector('.right-pupil');
+            const leftHand = document.getElementById('leftHand');
+            const rightHand = document.getElementById('rightHand');
+            const pandaMouth = document.getElementById('pandaMouth');
+
+            // Hàm di chuyển mắt theo input
+            function setupEyeTracking(input) {
+                input.addEventListener('input', function (e) {
+                    const cursorPosition = this.selectionStart;
+                    const textWidth = this.value.length;
+                    const maxMove = 5;
+                    let moveX = 0;
+
+                    if (textWidth > 0) {
+                        const ratio = (cursorPosition / textWidth) * 2 - 1;
+                        moveX = ratio * maxMove;
+                    }
+
+                    leftPupil.style.transform = `translate(calc(-50% + ${moveX}px), -50%)`;
+                    rightPupil.style.transform = `translate(calc(-50% + ${moveX}px), -50%)`;
+                });
+
+                input.addEventListener('mousemove', function (e) {
+                    const inputRect = this.getBoundingClientRect();
+                    const inputCenter = inputRect.left + inputRect.width / 2;
+                    const mouseX = e.clientX;
+                    const maxMove = 5;
+                    const moveX = ((mouseX - inputCenter) / inputRect.width) * maxMove * 2;
+
+                    leftPupil.style.transform = `translate(calc(-50% + ${moveX}px), -50%)`;
+                    rightPupil.style.transform = `translate(calc(-50% + ${moveX}px), -50%)`;
+                });
+            }
+
+            // Áp dụng tracking cho tất cả text inputs
+            inputs.forEach(input => {
+                setupEyeTracking(input);
+
+                input.addEventListener('focus', function () {
+                    // Mở mắt và hiển thị tay gõ phím
+                    leftEye.classList.remove('closed');
+                    rightEye.classList.remove('closed');
+                    leftHand.classList.remove('cover-eyes');
+                    rightHand.classList.remove('cover-eyes');
+                    leftHand.classList.add('typing');
+                    rightHand.classList.add('typing');
+                    pandaMouth.classList.add('happy');
+                });
+
+                input.addEventListener('blur', function () {
+                    leftHand.classList.remove('typing');
+                    rightHand.classList.remove('typing');
+                    pandaMouth.classList.remove('happy');
+                });
+            });
+
+            // Xử lý password input riêng - che mắt
+            passwordInput.addEventListener('focus', function () {
+                leftEye.classList.add('closed');
+                rightEye.classList.add('closed');
+                leftHand.classList.remove('typing');
+                rightHand.classList.remove('typing');
+                leftHand.classList.add('cover-eyes');
+                rightHand.classList.add('cover-eyes');
+                pandaMouth.classList.remove('happy');
+            });
+
+            passwordInput.addEventListener('blur', function () {
+                if (!this.value) {
+                    leftEye.classList.remove('closed');
+                    rightEye.classList.remove('closed');
+                    leftHand.classList.remove('cover-eyes');
+                    rightHand.classList.remove('cover-eyes');
+                }
+            });
+
+            // Reset mắt khi click ngoài
+            document.addEventListener('click', function (e) {
+                const isInputClick = Array.from(inputs).some(input => input.contains(e.target)) || 
+                                    passwordInput.contains(e.target);
+                
+                if (!isInputClick) {
+                    leftPupil.style.transform = 'translate(-50%, -50%)';
+                    rightPupil.style.transform = 'translate(-50%, -50%)';
+                    leftHand.classList.remove('typing');
+                    rightHand.classList.remove('typing');
+                    pandaMouth.classList.remove('happy');
+                    
+                    // Chỉ mở mắt nếu không có giá trị trong password
+                    if (!passwordInput.value) {
+                        leftEye.classList.remove('closed');
+                        rightEye.classList.remove('closed');
+                        leftHand.classList.remove('cover-eyes');
+                        rightHand.classList.remove('cover-eyes');
+                    }
+                }
+            });
+        });
+    </script>
+}

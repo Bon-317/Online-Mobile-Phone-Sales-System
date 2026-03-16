@@ -1,0 +1,54 @@
+﻿@model FSTORE.Models.UserProfile
+@{
+    ViewData["Title"] = "Chỉnh sửa thông tin cá nhân";
+}
+
+<div class="container mt-5 mb-5" style="min-height: 70vh;">
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-white">
+            <h4>Chỉnh sửa thông tin cá nhân</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Họ và tên</label>
+                    <input asp-for="Name" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input asp-for="Email" class="form-control" type="email" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Số điện thoại</label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Địa chỉ</label>
+                    <input asp-for="Address" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Ảnh đại diện (URL)</label>
+                    <input asp-for="ImageUrl" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">UID (không thể chỉnh sửa)</label>
+                    <input asp-for="Uid" class="form-control" readonly />
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success">💾 Lưu thay đổi</button>
+                    <a asp-action="Index" class="btn btn-secondary">⬅ Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

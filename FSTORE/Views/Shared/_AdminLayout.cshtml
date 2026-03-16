@@ -1,0 +1,209 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FSTORE Admin</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- Bootstrap 5.3 -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @RenderSection("Styles", required: false)
+
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --sidebar-bg: #1e293b;
+            --sidebar-width: 270px;
+            --header-height: 70px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            margin: 0;
+        }
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .admin-header {
+            height: var(--header-height);
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+        }
+        .admin-header .navbar-brand {
+            font-weight: 800;
+            font-size: 1.6rem;
+            color: #1e293b !important;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: #cbd5e1;
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            padding: 1.5rem 0;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            z-index: 1020;
+        }
+        .sidebar-brand {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 700 1.5rem 'Inter';
+            color: #60a5fa;
+            text-align: center;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 1.5rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar-link i {
+            width: 20px;
+            font-size: 1.1rem;
+        }
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: #ffffff;
+            padding-left: 2rem;
+        }
+        .sidebar-link.active {
+            background: #3b82f6;
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(59,130,246,0.5);
+        }
+
+        /* Content */
+        .admin-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 2rem;
+            width: calc(100vw - var(--sidebar-width));
+            min-height: calc(100vh - var(--header-height));
+            background: #f1f5f9;
+        }
+
+        /* Responsive */
+        @@media (max-width: 992px) {
+            .admin-sidebar { 
+                transform: translateX(-100%);
+                transition: 0.3s;
+            }
+            .admin-sidebar.show { transform: translateX(0); }
+            .admin-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <nav class="navbar navbar-expand navbar-light">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand" href="/Admin/Dashboard">FSTORE ADMIN</a>
+
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-muted">Chào, Admin</span>
+                    <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-crown text-warning"></i> FSTORE
+        </div>
+
+        <nav class="d-flex flex-column gap-1 px-3">
+            <a class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")"
+               asp-controller="Admin" asp-action="Dashboard">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+
+            <a class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Categories" ? "active" : "")"
+               asp-controller="Admin" asp-action="Categories">
+                <i class="fas fa-folder-open"></i> Danh mục
+            </a>
+
+            <a class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")"
+               asp-controller="Admin" asp-action="Users">
+                <i class="fas fa-users"></i> Người dùng
+            </a>
+
+            <a class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Orders" ? "active" : "")"
+               asp-controller="Admin" asp-action="Orders">
+                <i class="fas fa-shopping-cart"></i> Đơn hàng
+            </a>
+
+            <a class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "ProductsByCategory" ? "active" : "")"
+               asp-controller="Admin" asp-action="ProductsByCategory">
+                <i class="fas fa-box"></i> Sản phẩm
+            </a>
+
+            <!-- MỤC MỚI: QUẢN LÝ VOUCHER -->
+            <a class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Voucher" ? "active" : "")"
+               asp-controller="Voucher" asp-action="Index">
+                <i class="fas fa-tags"></i> Quản lý Voucher
+            </a>
+
+            <a class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Forum" ? "active" : "")"
+               asp-controller="Forum" asp-action="Index">
+                <i class="fas fa-bullhorn"></i> Diễn đàn
+            </a>
+
+            <hr class="border-secondary opacity-25 my-3">
+
+            <a class="sidebar-link" asp-area="" asp-controller="Home" asp-action="Index" target="_blank">
+                <i class="fas fa-external-link-alt"></i> Xem trang chủ
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

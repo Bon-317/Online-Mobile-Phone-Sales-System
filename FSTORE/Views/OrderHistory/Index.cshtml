@@ -1,0 +1,58 @@
+﻿@model List<FSTORE.Models.OrderModel>
+@{
+    ViewData["Title"] = "Lịch sử đơn hàng";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">📦 Lịch sử đơn hàng</h2>
+
+    @if (!Model.Any())
+
+    {
+        <p>Không có đơn hàng nào đã thanh toán.</p>
+    }
+
+    else
+
+    {
+
+        foreach (var order in Model)
+
+        {
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-light">
+                    <strong>Mã đơn hàng:</strong> @order.OrderId |
+                    <strong>Ngày:</strong> @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrWhiteSpace(order.UserName))
+
+                    {
+                        <p><strong>Người nhận:</strong> @order.UserName</p>
+                    }
+
+                    <p><strong>Địa chỉ:</strong> @(string.IsNullOrWhiteSpace(order.Address) ? "Chưa có địa chỉ" : order.Address)</p>
+
+                    <p><strong>Trạng thái:</strong> @(string.IsNullOrWhiteSpace(order.PaymentStatus) ? "Không xác định" : order.PaymentStatus)</p>
+
+                    <p><strong>Tổng tiền:</strong> @(order.TotalAmount > 0 ? order.TotalAmount.ToString("N0") + " ₫" : "0 ₫")</p>
+
+                    <hr />
+                    <h5>Sản phẩm:</h5>
+                    @foreach (var item in order.Items)
+
+                    {
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="@item.ImageUrl" alt="@item.Name" width="80" class="me-3 rounded shadow-sm" />
+                            <div>
+                                <p class="mb-1 fw-semibold">@item.Name</p>
+                                <p class="text-muted">Số lượng: @item.Quantity | Giá: @item.Price.ToString("N0") ₫</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+    }
+</div>

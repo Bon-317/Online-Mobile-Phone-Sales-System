@@ -1,0 +1,61 @@
+﻿@model FSTORE.Models.Comment
+@{
+    var currentUserEmail = User.Identity?.Name;
+    var userService = ViewBag.UserService as FSTORE.Services.IUserService;
+    var currentUserRole = currentUserEmail != null && userService != null
+        ? await userService.GetUserRole(currentUserEmail)
+        : "user";
+}
+
+<div class="border rounded p-3 mb-3 comment-box">
+    <strong>@Model.AuthorEmail</strong>
+    <small class="text-muted">@Model.CreatedAt.ToDateTime().ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+    <p>@Model.Content</p>
+
+    <div class="d-flex gap-2">
+        <form asp-action="AddComment" method="post">
+            <input type="hidden" name="postId" value="@Model.PostId" />
+            <input type="hidden" name="parentId" value="@Model.Id" />
+            <textarea name="content" rows="2" class="form-control" placeholder="Trả lời bình luận này..."></textarea>
+            <button type="submit" class="btn btn-sm btn-outline-primary mt-1">💬 Trả lời</button>
+        </form>
+
+        @if (currentUserRole == "admin")
+        {
+            <form asp-action="DeleteComment" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa bình luận này?')">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="postId" value="@Model.PostId" />
+                <button type="submit" class="btn btn-sm btn-outline-danger mt-1">🗑️ Xóa</button>
+            </form>
+        }
+    </div>
+
+    @if (Model.Children != null && Model.Children.Any())
+    {
+        <div class="ms-4 mt-3 border-start ps-3">
+            @foreach (var child in Model.Children)
+            {
+                @Html.Partial("_CommentPartial", child)
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .comment-box {
+        background-color: #f9f9f9;
+        transition: all 0.3s ease;
+    }
+
+        .comment-box:hover {
+            background-color: #f0f0ff;
+        }
+
+    .comment-thread .comment-box {
+        margin-bottom: 1rem;
+    }
+
+        .comment-thread .comment-box .comment-box {
+            margin-top: 1rem;
+        }
+</style>

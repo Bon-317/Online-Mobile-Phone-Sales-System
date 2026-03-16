@@ -1,0 +1,586 @@
+﻿@model List<FSTORE.Models.CartItem>
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    double initialSubtotal = Model.Where(i => i.Selected).Sum(x => x.Total);
+    int selectedCount = Model.Count(i => i.Selected);
+    bool allSelected = Model.Any() && Model.All(i => i.Selected);
+}
+
+<style>
+    .cart-container {
+        background-color: #ffffff;
+        min-height: calc(100vh - 200px);
+        padding: 40px 0;
+    }
+    .cart-header {
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    .cart-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #ffffff;
+    }
+    .empty-cart {
+        text-align: center;
+        padding: 80px 20px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        margin: 40px 0;
+    }
+    .empty-cart i {
+        font-size: 5rem;
+        color: #cbd5e0;
+        margin-bottom: 20px;
+    }
+    .empty-cart h3 {
+        color: #2d3748;
+        margin-bottom: 15px;
+    }
+    .empty-cart p {
+        color: #718096;
+        margin-bottom: 25px;
+    }
+    .cart-layout {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 30px;
+        align-items: start;
+    }
+    .cart-items-section {
+        width: 100%;
+    }
+    .cart-table-wrapper {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    .cart-table {
+        margin: 0;
+        background: white;
+    }
+    .cart-table thead {
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        color: white;
+    }
+    .cart-table thead th {
+        border: none;
+        padding: 18px 15px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-align: center;
+        vertical-align: middle;
+        color: #ffffff !important;
+    }
+    .cart-table tbody td {
+        padding: 20px 15px;
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .cart-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .cart-table tbody tr:hover {
+        background-color: #f7fafc;
+        transition: all 0.3s ease;
+    }
+    .product-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    .product-img:hover {
+        transform: scale(1.1);
+    }
+    .product-name {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 1rem;
+    }
+    .product-price {
+        color: #e53e3e;
+        font-weight: 700;
+        font-size: 1.05rem;
+    }
+    .quantity-form {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: center;
+    }
+    .quantity-input {
+        width: 70px;
+        text-align: center;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    .quantity-input:focus {
+        border-color: #000000;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+    .btn-update {
+        background: linear-gradient(135deg, #000000, #333333);
+        color: white;
+        border: none;
+        padding: 6px 15px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .btn-update:hover {
+        background: linear-gradient(135deg, #333333, #000000);
+        transform: translateY(-2px);
+    }
+    .btn-remove {
+        background: #e53e3e;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.2);
+    }
+    .btn-remove:hover {
+        background: #c53030;
+        transform: translateY(-2px);
+    }
+    .payment-section {
+        position: sticky;
+        top: 20px;
+    }
+    .cart-summary {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    .summary-title {
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        color: #ffffff !important;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .summary-title h3 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #ffffff !important;
+    }
+    .cart-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .cart-total h4 {
+        margin: 0;
+        color: #2d3748;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    .total-amount {
+        color: #e53e3e;
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+    .payment-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .payment-method-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 10px;
+        padding-left: 5px;
+    }
+    .btn-payment {
+        width: 100%;
+        padding: 16px 25px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        border: none;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-payment::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    .btn-payment:hover::before {
+        width: 400px;
+        height: 400px;
+    }
+    .btn-payment i {
+        font-size: 1.3rem;
+        position: relative;
+        z-index: 1;
+    }
+    .btn-payment span {
+        position: relative;
+        z-index: 1;
+    }
+    .btn-checkout {
+        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        color: #ffffff !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    .btn-checkout:hover {
+        background: linear-gradient(135deg, #333333 0%, #555555 100%);
+        transform: translateY(-3px);
+    }
+    .btn-vnpay {
+        background: linear-gradient(135deg, #0066b2 0%, #008fe5 100%);
+        color: #ffffff !important;
+        box-shadow: 0 6px 20px rgba(0, 102, 178, 0.3);
+    }
+    .btn-vnpay:hover {
+        background: linear-gradient(135deg, #004d85 0%, #0066b2 100%);
+        transform: translateY(-3px);
+    }
+    .divider {
+        height: 1px;
+        background: linear-gradient(to right, transparent, #cbd5e0, transparent);
+        margin: 20px 0;
+    }
+    .cart-actions-bottom {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+    }
+    .btn-action-secondary {
+        width: 100%;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border: none;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-continue {
+        background: linear-gradient(135deg, #718096, #4a5568);
+        color: #ffffff !important;
+    }
+    .btn-continue:hover {
+        background: linear-gradient(135deg, #4a5568, #2d3748);
+        transform: translateY(-2px);
+    }
+    .btn-clear {
+        background: linear-gradient(135deg, #ffc107, #ffb300);
+        color: #2d3748;
+    }
+    .btn-clear:hover {
+        background: linear-gradient(135deg, #ffb300, #ffa000);
+        transform: translateY(-2px);
+    }
+    .voucher-area {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .voucher-applied {
+        background: #d4edda;
+        color: #155724;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #c3e6cb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    @@media (max-width: 1200px) {
+        .cart-layout { grid-template-columns: 1fr 350px; }
+    }
+    @@media (max-width: 992px) {
+        .cart-layout { grid-template-columns: 1fr; }
+        .payment-section { position: static; }
+    }
+</style>
+
+<div class="cart-container">
+    <div class="container">
+        @if (!Model.Any())
+        {
+            <div class="empty-cart">
+                <i class="fas fa-shopping-basket"></i>
+                <h3>Giỏ hàng trống</h3>
+                <p>Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy khám phá các sản phẩm tuyệt vời của chúng tôi!</p>
+                <a href="/Product/Index" class="btn btn-action-secondary btn-continue">
+                    <i class="fas fa-arrow-left"></i> Mua sắm ngay
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="cart-layout">
+                <!-- Danh sách sản phẩm -->
+                <div class="cart-items-section">
+                    <div class="cart-table-wrapper">
+                        <table class="table cart-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:5%;">
+                                        <input type="checkbox" class="form-check-input" id="select-all-checkbox" @(allSelected ? "checked" : "") />
+                                    </th>
+                                    <th>Hình ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Tổng</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr data-product-id="@item.ProductId" data-price-per-unit="@item.Price">
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input item-checkbox" value="@item.ProductId" @(item.Selected ? "checked" : "") />
+                                        </td>
+                                        <td><img src="@item.ImageUrl" alt="@item.Name" class="product-img" /></td>
+                                        <td><div class="product-name">@item.Name</div></td>
+                                        <td><span class="product-price">@item.Price.ToString("N0") ₫</span></td>
+                                        <td>
+                                            <form asp-action="Update" asp-controller="Cart" method="post" class="quantity-form">
+                                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                                <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control quantity-input" />
+                                                <button type="submit" class="btn btn-update"><i class="fas fa-sync-alt"></i></button>
+                                            </form>
+                                        </td>
+                                        <td><span class="product-price item-total">@item.Total.ToString("N0") ₫</span></td>
+                                        <td>
+                                            <form asp-action="Remove" asp-controller="Cart" method="post">
+                                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                                <button type="submit" class="btn btn-remove"><i class="fas fa-trash-alt"></i> Xóa</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tổng tiền + Voucher + Thanh toán -->
+                <div class="payment-section">
+                    <div class="cart-summary">
+                        <div class="summary-title">
+                            <h3><i class="fas fa-calculator"></i> Tổng đơn hàng</h3>
+                        </div>
+
+                        <!-- VOUCHER -->
+                        <div class="voucher-area">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <strong><i class="fas fa-tag"></i> Mã giảm giá:</strong>
+                                <div class="input-group" id="voucher-input-area">
+                                    <input type="text" id="voucher-code" class="form-control" placeholder="Nhập mã voucher">
+                                    <button class="btn btn-outline-primary" type="button" id="btn-apply-voucher">Áp dụng</button>
+                                </div>
+                            </div>
+                            <div id="voucher-applied-area" class="voucher-applied" style="display:none;">
+                                <span>Đã áp dụng: <strong id="applied-code"></strong></span>
+                                <button type="button" id="btn-remove-voucher" class="btn-close"></button>
+                            </div>
+                        </div>
+
+                        <div class="cart-total">
+                            <div>
+                                <div>Tạm tính (<span id="selected-items-count">@selectedCount</span> sản phẩm):</div>
+                                <strong id="cart-subtotal" data-raw-total="@initialSubtotal">@initialSubtotal.ToString("N0") ₫</strong>
+                            </div>
+                        </div>
+
+                        <div class="cart-total" id="discount-area" style="display:none;">
+                            <div>Giảm giá:</div>
+                            <strong id="cart-discount" class="text-danger" data-raw-discount="0">-0 ₫</strong>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="cart-total bg-white">
+                            <h4>Thành tiền:</h4>
+                            <span class="total-amount" id="cart-final-total">@initialSubtotal.ToString("N0") ₫</span>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="payment-methods">
+                            <form method="post" asp-controller="Checkout" asp-action="CreateCodOrder" id="cod-form" class="mb-3">
+                                <input type="hidden" name="name" value="@User.Identity.Name" />
+                                <input type="hidden" name="amount" id="cod-amount" value="@initialSubtotal" />
+
+                                @for (int i = 0; i < Model.Count; i++)
+                                {
+                                    if (Model[i].Selected)
+                                    {
+                                        <input type="hidden" name="Items[@i].ProductId" value="@Model[i].ProductId" />
+                                        <input type="hidden" name="Items[@i].Name" value="@Model[i].Name" />
+                                        <input type="hidden" name="Items[@i].Price" value="@Model[i].Price" />
+                                        <input type="hidden" name="Items[@i].Quantity" value="@Model[i].Quantity" />
+                                        <input type="hidden" name="Items[@i].ImageUrl" value="@Model[i].ImageUrl" />
+                                    }
+                                }
+
+                                <button type="submit" class="btn-payment btn-checkout">
+                                    <i class="fas fa-money-check-alt"></i> Thanh toán khi nhận hàng
+                                </button>
+                            </form>
+
+                            <form method="post" asp-controller="Payment" asp-action="CreatePaymentUrlVnpay" id="vnpay-form">
+                                <input type="hidden" name="name" value="@User.Identity.Name" />
+                                <input type="hidden" name="amount" id="vnpay-amount" value="@initialSubtotal" />
+                                <input type="hidden" name="orderDescription" value="Thanh toán qua VNPay tại FStore" />
+                                <input type="hidden" name="orderType" value="other" />
+
+                                @for (int i = 0; i < Model.Count; i++)
+                                {
+                                    if (Model[i].Selected)
+                                    {
+                                        <input type="hidden" name="Items[@i].ProductId" value="@Model[i].ProductId" />
+                                        <input type="hidden" name="Items[@i].Name" value="@Model[i].Name" />
+                                        <input type="hidden" name="Items[@i].Price" value="@Model[i].Price" />
+                                        <input type="hidden" name="Items[@i].Quantity" value="@Model[i].Quantity" />
+                                        <input type="hidden" name="Items[@i].ImageUrl" value="@Model[i].ImageUrl" />
+                                    }
+                                }
+
+                                <button type="submit" class="btn-payment btn-vnpay">
+                                    <i class="fas fa-wallet"></i> Thanh toán qua VNPay
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="divider"></div>
+                        <div class="cart-actions-bottom">
+                            <a href="/Cart/Clear" class="btn-action-secondary btn-clear">
+                                <i class="fas fa-trash"></i faded> Xóa giỏ hàng
+                            </a>
+                            <a href="/Product/Index" class="btn-action-secondary btn-continue">
+                                <i class="fas fa-arrow-left"></i> Tiếp tục mua sắm
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            function updateSummary() {
+                let subtotal = 0;
+                let selectedCount = 0;
+
+                $('.item-checkbox:checked').each(function () {
+                    const row = $(this).closest('tr');
+                    const totalText = row.find('.item-total').text().replace(/[^0-9]/g, '');
+                    subtotal += parseInt(totalText) || 0;
+                    selectedCount++;
+                });
+
+                let currentDiscount = parseFloat($('#cart-discount').attr('data-raw-discount')) || 0;
+
+                if (subtotal < currentDiscount) {
+                    $('#btn-remove-voucher').click();
+                    currentDiscount = 0;
+                }
+
+                const finalTotal = subtotal - currentDiscount;
+
+                $('#selected-items-count').text(selectedCount);
+                $('#cart-subtotal').text(subtotal.toLocaleString('vi-VN') + ' ₫');
+                $('#cart-subtotal').attr('data-raw-total', subtotal);
+                $('#vnpay-amount').val(finalTotal);
+                $('#cod-amount').val(finalTotal);
+
+                if (currentDiscount > 0) {
+                    $('#cart-discount').text('-' + currentDiscount.toLocaleString('vi-VN') + ' ₫');
+                    $('#discount-area').show();
+                } else {
+                    $('#discount-area').hide();
+                }
+
+                $('#cart-final-total').text(finalTotal.toLocaleString('vi-VN') + ' ₫');
+            }
+
+            // ÁP DỤNG VOUCHER – ĐÃ CHỈNH ĐÚNG CONTROLLER
+            $('#btn-apply-voucher').click(function () {
+                const code = $('#voucher-code').val().trim();
+                if (!code) return alert('Vui lòng nhập mã voucher!');
+
+                $.post('@Url.Action("ApplyVoucher", "Cart")', { voucherCode: code }, function (res) {
+                    if (res.success) {
+                        $('#cart-discount').attr('data-raw-discount', res.discountAmount);
+                        $('#applied-code').text(code.toUpperCase());
+                        $('#voucher-input-area').hide();
+                        $('#voucher-applied-area').show();
+                        updateSummary();
+                        alert(res.message);
+                    } else {
+                        alert(res.message);
+                    }
+                }).fail(function () {
+                    alert('Lỗi kết nối, vui lòng thử lại!');
+                });
+            });
+
+            // GỠ VOUCHER
+            $('#btn-remove-voucher').click(function () {
+                $.post('@Url.Action("RemoveVoucher", "Cart")', function () {
+                    $('#cart-discount').attr('data-raw-discount', 0);
+                    $('#voucher-code').val('');
+                    $('#voucher-input-area').show();
+                    $('#voucher-applied-area').hide();
+                    updateSummary();
+                });
+            });
+
+            updateSummary();
+        });
+    </script>
+}

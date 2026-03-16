@@ -1,0 +1,64 @@
+﻿@model List<FSTORE.Models.Product>
+@{
+    ViewData["Title"] = "Sản phẩm theo danh mục";
+    var category = ViewBag.Category as string;
+        Layout = "_AdminLayout";
+
+}
+
+<h2>📦 Sản phẩm thuộc danh mục: @category</h2>
+<a class="btn btn-success mb-3" href="/Admin/AddProduct?category=@category">➕ Thêm sản phẩm mới</a>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Ảnh</th>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>Kho</th>
+            <th>Hiển thị</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td><img src="@p.imageUrl" width="80" onerror="this.src='/images/default.png'" /></td>
+                <td>@p.name</td>
+                <td>@p.price.ToString("N0") VND</td>
+                <td>@p.stock</td>
+                <td>@(p.visible ? "✅" : "❌")</td>
+                <td>
+                    <a class="btn btn-warning btn-sm" href="/Admin/EditProduct?id=@p.ProductId">Sửa</a>
+
+                    @if (p.visible)
+                    {
+                        <form asp-action="HideProduct" method="post" style="display:inline">
+                            <input type="hidden" name="id" value="@p.ProductId" />
+                            <button type="submit" class="btn btn-danger btn-sm">Ẩn</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-action="ShowProduct" method="post" style="display:inline">
+                            <input type="hidden" name="id" value="@p.ProductId" />
+                            <button type="submit" class="btn btn-success btn-sm">Hiện</button>
+                        </form>
+                    }
+
+                    <form asp-action="DeleteProduct" method="post" style="display:inline">
+                        <input type="hidden" name="id" value="@p.ProductId" />
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Xóa</button>
+                    </form>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

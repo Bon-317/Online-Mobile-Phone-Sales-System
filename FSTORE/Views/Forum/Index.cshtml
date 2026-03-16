@@ -1,0 +1,38 @@
+﻿@model List<FSTORE.Forum.PostWithCommentsViewModel>
+@{
+    Layout = "_Layout";
+}
+
+<div class="mb-4 text-end">
+    <a href="/Forum/Create" class="btn btn-success">📝 Đăng bài viết mới</a>
+</div>
+
+@foreach (var post in Model)
+{
+    <div class="card mb-4">
+        <div class="card-body">
+
+            <h4>@post.Post.Title</h4>
+            <p>@post.Post.Content</p>
+            <p>
+                <strong style="color:@post.RoleColor">[@post.RoleLabel]</strong> - @post.Post.AuthorEmail<br />
+                <small>@post.Post.CreatedAt.ToDateTime().ToString("dd/MM/yyyy HH:mm")</small>
+            </p>
+
+            <!-- Nút chuyển đến trang chi tiết để bình luận -->
+            <a href="/Forum/Detail/@post.Post.Id#commentForm" class="btn btn-outline-secondary btn-sm">
+                ✍️ Bình luận
+            </a>
+
+            <!-- Hiển thị bình luận -->
+            <div class="comments mt-3">
+                <h5>💬 Bình luận:</h5>
+                @await Component.InvokeAsync("CommentTree", new
+                    {
+                        comments = post.Comments,
+                        postId = post.Post.Id
+                    })
+            </div>
+        </div>
+    </div>
+}

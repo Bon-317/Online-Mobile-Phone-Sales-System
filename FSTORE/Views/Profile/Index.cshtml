@@ -1,0 +1,628 @@
+﻿@model FSTORE.Models.UserProfile
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* Video Background */
+    .video-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .video-background video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .video-background::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.3) 100%);
+    }
+
+    /* Particles */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.4;
+    }
+
+    .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        animation: float linear infinite;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+
+    @@keyframes float {
+        0% {
+            transform: translateY(100vh) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+
+    .profile-view-container {
+        min-height: 100vh;
+        padding: 100px 20px 80px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-card-wrapper {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    /* Glassmorphism Card */
+    .profile-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+        border-radius: 30px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        animation: fadeInUp 0.8s ease-out;
+        position: relative;
+    }
+
+    .profile-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.8) 50%, 
+            transparent 100%
+        );
+        animation: shimmer 3s infinite;
+    }
+
+    @@keyframes shimmer {
+        0%, 100% {
+            opacity: 0.5;
+        }
+        50% {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, 
+            rgba(0, 0, 0, 0.4) 0%, 
+            rgba(0, 0, 0, 0.2) 100%);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 35px 30px;
+        text-align: center;
+        position: relative;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-header h4 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        color: #ffffff;
+    }
+
+    .profile-avatar-section {
+        text-align: center;
+        padding: 50px 30px 40px;
+        position: relative;
+    }
+
+    .profile-avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s ease;
+        position: relative;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-avatar:hover {
+        transform: scale(1.08) rotate(5deg);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    .avatar-badge {
+        margin-top: 20px;
+        display: inline-block;
+        background: rgba(56, 161, 105, 0.3);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 10px 24px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 20px rgba(56, 161, 105, 0.3);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .profile-info-section {
+        padding: 30px 40px 40px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.4s ease;
+        animation: slideInLeft 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+
+    .info-item:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateX(10px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .info-item:nth-child(1) { animation-delay: 0.1s; }
+    .info-item:nth-child(2) { animation-delay: 0.15s; }
+    .info-item:nth-child(3) { animation-delay: 0.2s; }
+    .info-item:nth-child(4) { animation-delay: 0.25s; }
+    .info-item:nth-child(5) { animation-delay: 0.3s; }
+
+    @@keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .info-icon {
+        width: 55px;
+        height: 55px;
+        background: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.25) 0%, 
+            rgba(255, 255, 255, 0.15) 100%);
+        backdrop-filter: blur(10px);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        flex-shrink: 0;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .info-item:hover .info-icon {
+        background: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.35) 0%, 
+            rgba(255, 255, 255, 0.25) 100%);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .info-icon i {
+        font-size: 1.5rem;
+        color: #ffffff;
+        text-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover .info-icon i {
+        transform: scale(1.1);
+    }
+
+    .info-content {
+        flex: 1;
+    }
+
+    .info-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.65);
+        font-weight: 700;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-label::before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+
+    .info-value {
+        font-size: 1.2rem;
+        color: #ffffff;
+        font-weight: 600;
+        text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+        line-height: 1.5;
+        word-break: break-word;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 24px;
+        border-radius: 30px;
+        font-size: 1rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, 
+            rgba(255, 193, 7, 0.4) 0%, 
+            rgba(255, 165, 0, 0.3) 100%);
+        backdrop-filter: blur(15px);
+        color: #ffffff;
+        border: 2px solid rgba(255, 193, 7, 0.6);
+        box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4);
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .role-badge:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(255, 193, 7, 0.5);
+    }
+
+    .role-badge i {
+        font-size: 1.1rem;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .profile-actions {
+        padding: 0 40px 45px;
+        text-align: center;
+    }
+
+    .btn-edit-profile {
+        background: rgba(255, 193, 7, 0.3);
+        backdrop-filter: blur(15px);
+        color: #ffffff;
+        border: 2px solid rgba(255, 193, 7, 0.5);
+        padding: 16px 45px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.4s ease;
+        text-decoration: none;
+        box-shadow: 0 10px 30px rgba(255, 193, 7, 0.3);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-edit-profile::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-edit-profile:hover::before {
+        width: 400px;
+        height: 400px;
+    }
+
+    .btn-edit-profile:hover {
+        background: rgba(255, 193, 7, 0.4);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(255, 193, 7, 0.5);
+        color: #ffffff;
+        border-color: rgba(255, 193, 7, 0.8);
+    }
+
+    .btn-edit-profile i {
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-edit-profile span {
+        position: relative;
+        z-index: 1;
+    }
+
+    .decorative-line {
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.5) 50%, 
+            transparent 100%);
+        margin: 30px 40px;
+    }
+
+    /* Decorative circles */
+    .deco-circle {
+        position: fixed;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        animation: rotate 25s linear infinite;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .deco-circle-1 {
+        width: 400px;
+        height: 400px;
+        top: -200px;
+        right: -200px;
+    }
+
+    .deco-circle-2 {
+        width: 300px;
+        height: 300px;
+        bottom: -150px;
+        left: -150px;
+        animation-direction: reverse;
+        animation-duration: 20s;
+    }
+
+    @@keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .profile-view-container {
+            padding: 80px 15px 60px;
+        }
+
+        .profile-header h4 {
+            font-size: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 130px;
+            height: 130px;
+        }
+
+        .profile-info-section {
+            padding: 20px 25px 30px;
+        }
+
+        .profile-actions {
+            padding: 0 25px 35px;
+        }
+
+        .info-item {
+            flex-direction: column;
+            padding: 18px;
+        }
+
+        .info-icon {
+            margin-bottom: 12px;
+        }
+
+        .btn-edit-profile {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<!-- Video Background -->
+<div class="video-background">
+    <video autoplay muted loop playsinline>
+        <source src="~/videos" type="video/mp4" />
+        Trình duyệt của bạn không hỗ trợ video.
+    </video>
+</div>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Decorative Circles -->
+<div class="deco-circle deco-circle-1"></div>
+<div class="deco-circle deco-circle-2"></div>
+
+<div class="profile-view-container">
+    <div class="container">
+        <div class="profile-card-wrapper">
+            <div class="profile-card">
+                <!-- Header -->
+                <div class="profile-header">
+                    <h4>
+                        <i class="fas fa-user-circle"></i>
+                        Thông tin cá nhân
+                    </h4>
+                </div>
+
+                <!-- Avatar Section -->
+                <div class="profile-avatar-section">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" 
+                             alt="Ảnh đại diện" 
+                             class="profile-avatar"
+                             onerror="this.src='/images/default-avatar.png'" />
+                    }
+                    else
+                    {
+                        <img src="~/images/default-avatar.png" 
+                             alt="Ảnh mặc định" 
+                             class="profile-avatar" />
+                    }
+                    <div>
+                        <div class="avatar-badge">
+                            <i class="fas fa-check-circle"></i> Đã xác thực
+                        </div>
+                    </div>
+                </div>
+
+                <div class="decorative-line"></div>
+
+                <!-- Info Section -->
+                <div class="profile-info-section">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Họ và tên</div>
+                            <div class="info-value">@Model.Name</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Email</div>
+                            <div class="info-value">@Model.Email</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Số điện thoại</div>
+                            <div class="info-value">@Model.Phone</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Địa chỉ</div>
+                            <div class="info-value">@Model.Address</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <div class="info-label">Vai trò</div>
+                            <div class="info-value">
+                                <span class="role-badge">
+                                    <i class="fas fa-crown"></i> @Model.Role
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="profile-actions">
+                    <a asp-action="Edit" 
+                       asp-controller="Profile" 
+                       asp-route-uid="@Model.Uid" 
+                       class="btn-edit-profile">
+                        <i class="fas fa-edit"></i>
+                        <span>Chỉnh sửa thông tin</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles');
+    const particleCount = 35;
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        const size = Math.random() * 7 + 3;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = (Math.random() * 12 + 10) + 's';
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        
+        particlesContainer.appendChild(particle);
+    }
+</script>

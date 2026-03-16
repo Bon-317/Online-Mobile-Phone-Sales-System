@@ -1,0 +1,93 @@
+﻿@model FSTORE.Models.Voucher
+@{
+    ViewData["Title"] = "Chỉnh sửa Voucher";
+
+    // Tạo danh sách các mức % giảm giá
+    var percentageList = new List<SelectListItem>();
+    for (int i = 5; i <= 50; i += 5)
+    {
+        percentageList.Add(new SelectListItem { Value = i.ToString(), Text = i + "%" });
+    }
+}
+
+<h1>Chỉnh sửa Voucher: @Model.code</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input type="hidden" asp-for="DocumentId" />
+
+            <div class="mb-3">
+                <label asp-for="code" class="form-label">Mã Voucher</label>
+                <input asp-for="code" class="form-control" />
+                <span asp-validation-for="code" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="discountValue" class="form-label">Mức giảm giá</label>
+                <select asp-for="discountValue" class="form-select" asp-items="percentageList">
+                </select>
+                <span asp-validation-for="discountValue" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="minOrderAmount" class="form-label">Đơn hàng tối thiểu (VND)</label>
+                <input type="hidden" asp-for="minOrderAmount" />
+                <input type="text" id="minOrderAmountDisplay" class="form-control" />
+                <span asp-validation-for="minOrderAmount" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ExpiryDateTime" class="form-label">Ngày hết hạn</label>
+                <input asp-for="ExpiryDateTime" type="datetime-local" class="form-control" />
+                <span asp-validation-for="ExpiryDateTime" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            // --- Code định dạng số (Giữ nguyên) ---
+            var hiddenInput = $('#minOrderAmount');
+            var displayInput = $('#minOrderAmountDisplay');
+            var initialValue = parseInt(hiddenInput.val(), 10) || 0;
+            displayInput.val(initialValue.toLocaleString('vi-VN'));
+
+            displayInput.on('input', function(e) {
+                let rawValue = $(this).val().replace(/[^\d]/g, '');
+                let num = 0;
+                if (rawValue !== '') {
+                    num = parseInt(rawValue, 10);
+                }
+                hiddenInput.val(num);
+                $(this).val(num.toLocaleString('vi-VN'));
+            });
+
+            // --- Code logic ngày (Giống file Create.cshtml) ---
+            var dateInput = $('#ExpiryDateTime');
+            var now = new Date();
+            now.setSeconds(0);
+            now.setMilliseconds(0);
+
+            var year = now.getFullYear();
+            var month = (now.getMonth() + 1).toString().padStart(2, '0');
+            var day = now.getDate().toString().padStart(2, '0');
+            var hours = now.getHours().toString().padStart(2, '0');
+            var minutes = now.getMinutes().toString().padStart(2, '0');
+
+            var minDateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+            dateInput.attr('min', minDateTimeString);
+        });
+    </script>
+}

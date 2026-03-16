@@ -1,0 +1,19 @@
+﻿@model FSTORE.Models.Post
+
+<h3>@Model.Title</h3>
+<p>@Model.Content</p>
+
+<form asp-action="AddComment" method="post">
+    <input type="hidden" name="postId" value="@Model.Id" />
+    <textarea name="content" class="form-control" rows="3" placeholder="Viết bình luận..."></textarea>
+    <button type="submit" class="btn btn-primary mt-2">Gửi bình luận</button>
+</form>
+
+@if (Model.Comments != null && Model.Comments.Any())
+{
+    @foreach (var comment in Model.Comments)
+    {
+        @Html.Partial("_CommentPartial", comment)
+    }
+}
+

@@ -1,0 +1,16 @@
+﻿@model List<FSTORE.Models.Product>
+
+@if (Model.Any())
+{
+    <ul class="list-group position-absolute w-100 z-3" style="max-height: 300px; overflow-y: auto;">
+        @foreach (var item in Model)
+        {
+            <li class="list-group-item list-group-item-action">
+                <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductId" class="text-decoration-none text-dark">
+                    <strong>@item.name</strong><br />
+                    <small class="text-muted">@item.price.ToString("N0") ₫</small>
+                </a>
+            </li>
+        }
+    </ul>
+}

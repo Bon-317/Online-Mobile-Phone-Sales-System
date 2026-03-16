@@ -1,0 +1,149 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_AdminLayout";
+}
+
+<h1>Dashboard</h1>
+
+<div class="container mt-4">
+    <div class="row g-4">
+        <div class="col-12 col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Doanh số theo danh mục (Cột)</div>
+                <div class="card-body">
+                    <div style="height:260px"><canvas id="salesByCategoryChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Tỷ trọng doanh thu theo danh mục (Tròn)</div>
+                <div class="card-body">
+                    <div style="height:260px"><canvas id="salesShareDonut"></canvas></div>
+                </div>
+            </div>
+        </div>
+        <!-- Có thể thêm các ô biểu đồ khác bên dưới: mỗi hàng 2 biểu đồ -->
+    </div>
+    <div id="sales-empty" class="alert alert-info d-none mt-3">Chưa có dữ liệu doanh số.</div>
+    <div id="sales-error" class="alert alert-danger d-none mt-3">Không tải được dữ liệu doanh số.</div>
+    <div class="text-muted small mt-2">Nguồn dữ liệu: Orders (đơn đã thanh toán thành công)</div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    (function () {
+        const barEl = document.getElementById('salesByCategoryChart');
+        const donutEl = document.getElementById('salesShareDonut');
+        const emptyEl = document.getElementById('sales-empty');
+        const errorEl = document.getElementById('sales-error');
+
+        async function fetchData() {
+            try {
+                const res = await fetch('/Admin/SalesByCategory');
+                if (!res.ok) throw new Error('Network response was not ok');
+                const data = await res.json();
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                errorEl.classList.remove('d-none');
+                return [];
+            }
+        }
+
+        function makeColors(n) {
+            const base = [
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)'
+            ];
+            const colors = [];
+            for (let i = 0; i < n; i++) colors.push(base[i % base.length]);
+            return colors;
+        }
+
+        function renderCharts(items) {
+            if (!items.length) {
+                emptyEl.classList.remove('d-none');
+                return;
+            }
+            const labels = items.map(i => i.category);
+            const values = items.map(i => i.sales);
+            const colors = makeColors(values.length);
+            const total = values.reduce((a, b) => a + b, 0) || 1;
+            const percents = values.map(v => Math.round((v / total) * 1000) / 10); // 1 decimal
+
+            new Chart(barEl, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh số (VND)',
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.6', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (value) => new Intl.NumberFormat('vi-VN').format(value)
+                            },
+                            title: { display: true, text: 'VND' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Danh mục' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` ${new Intl.NumberFormat('vi-VN').format(ctx.parsed.y)} VND`
+                            }
+                        }
+                    }
+                }
+            });
+
+            new Chart(donutEl, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tỷ trọng (%)',
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.6', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const v = ctx.parsed;
+                                    const p = Math.round((v / total) * 1000) / 10;
+                                    return ` ${ctx.label}: ${p}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        fetchData().then(renderCharts);
+    })();
+</script>

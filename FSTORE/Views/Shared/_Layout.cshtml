@@ -1,0 +1,432 @@
+﻿@*
+    Layout tổng thể FSTORE
+    Bao gồm: Navbar + Footer + RenderBody
+    Responsive + Fixed Navbar (Apple-style blur) + Footer
+*@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FSTORE</title>
+
+    <!-- Bootstrap & Icons (chỉ include 1 lần) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/FSTORE.styles.css" asp-append-version="true" />
+
+    @RenderSection("Styles", required: false)
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #ffffff;
+            padding-top: 70px; 
+        }
+
+        .container-fluid {
+            flex: 1 0 auto;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.7) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            font-size: 1rem;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+            height: 60px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Navbar khi cuộn xuống - thêm bóng và tăng độ mờ */
+        .navbar.scrolled {
+            background: rgba(0, 0, 0, 0.85) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .navbar-brand img {
+            height: 50px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-link, .navbar .btn-link {
+            padding: 0.5rem 1.2rem !important;
+            color: rgba(255, 255, 255, 0.92) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
+            margin: 0 0.2rem;
+            border-radius: 6px;
+            letter-spacing: 0.01em;
+        }
+
+        .nav-link:hover, .navbar .btn-link:hover {
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .navbar-toggler {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 0.4rem 0.6rem;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.15);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .cart-badge {
+            font-size: 0.7rem;
+            padding: 3px 7px;
+            background-color: #ff3b30;
+            border: 2px solid rgba(0, 0, 0, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Search box styling */
+        .navbar .form-control {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .navbar .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar .btn-outline-primary {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            background-color: transparent;
+        }
+
+        .navbar .btn-outline-primary:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+        }
+
+        /* ===================== FOOTER ===================== */
+        footer {
+            background: #ffffff;
+            color: #000000 !important;
+            border-top: 2px solid #e2e8f0;
+            margin-top: auto;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+
+        footer h5, footer h6 {
+            color: #000000 !important;
+        }
+
+        footer p, footer li {
+            color: #333333 !important;
+        }
+
+        footer a {
+            color: #1a3a8a !important;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #2d5bb8 !important;
+            text-decoration: underline;
+        }
+
+        footer hr {
+            border-color: #e2e8f0 !important;
+            opacity: 1;
+        }
+
+        footer .text-warning {
+            color: #ffc107 !important;
+            font-weight: 600;
+        }
+
+        /* Social icons styling */
+        footer .fab {
+            transition: all 0.3s ease;
+        }
+
+        footer a:hover .fab {
+            transform: scale(1.1);
+        }
+
+        /* Icon styling */
+        footer i.fa, footer i.fas {
+            color: #1a3a8a !important;
+            margin-right: 8px;
+        }
+
+        /* Text center for mobile */
+        .text-center.small {
+            color: #666666 !important;
+        }
+
+        @@media (max-width: 768px) {
+            .navbar-brand img {
+                height: 40px;
+            }
+
+            .nav-link {
+                padding: 0.4rem 0.8rem !important;
+                font-size: 0.85rem;
+            }
+
+            footer .col-md-4 {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+
+            footer .col-md-4:last-child {
+                margin-bottom: 0;
+            }
+
+            body {
+                padding-top: 60px;
+            }
+
+            footer {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Decorative elements */
+        footer::after {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                #ffc107 25%, 
+                #ffd54f 50%, 
+                #ffc107 75%, 
+                transparent 100%
+            );
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @@keyframes shimmer {
+            0%, 100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark fixed-top" id="mainNavbar">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">
+                    <img src="~/images/logo.fstore.jpg" alt="FSTORE Logo" />
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        @if (User.Identity.IsAuthenticated && User.HasClaim("role", "admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold" asp-controller="Admin" asp-action="Index">Quản trị viên</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Product" asp-action="Index">Sản phẩm</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Forum" asp-action="Index">Diễn đàn</a></li>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-controller="Favorites" asp-action="Index">Yêu thích</a></li>
+                            }
+                        }
+                    </ul>
+
+                    <form asp-controller="Product" asp-action="Search" method="get" class="d-flex ms-3" role="search">
+                        <input id="searchBox" name="keyword" class="form-control me-2" type="search" placeholder="Tìm sản phẩm..." aria-label="Search" />
+                        <button class="btn btn-outline-primary" type="submit">🔍</button>
+                    </form>
+
+                    <ul class="navbar-nav ms-3">
+                        <li class="nav-item">@await Component.InvokeAsync("CartCount")</li>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a asp-controller="Profile" asp-action="Index" class="nav-link"><i class="fa-solid fa-user"></i> @User.Identity.Name</a>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-link nav-link">Đăng xuất</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Auth" asp-action="Login">Đăng nhập</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Auth" asp-action="Signup">Đăng ký</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid">
+        <main role="main" class="pb-3">@RenderBody()</main>
+    </div>
+
+    @if (ViewBag.HideFooter == null || ViewBag.HideFooter == false)
+    {
+        <footer id="mainFooter">
+            <div class="container py-4">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <h5 class="fw-bold text-warning">FSTORE</h5>
+                        <p class="small">
+                            Nền tảng thương mại điện tử uy tín hàng đầu Việt Nam,
+                            chuyên cung cấp các sản phẩm điện thoại chính hãng,
+                            giá tốt và dịch vụ khách hàng tận tâm.
+                        </p>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <h6 class="fw-bold text-warning">Liên kết nhanh</h6>
+                        <ul class="list-unstyled small">
+                            <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                            <li><a asp-controller="Product" asp-action="Index">Sản phẩm</a></li>
+                            <li><a asp-controller="Forum" asp-action="Index">Diễn đàn</a></li>
+                            <li><a asp-controller="Home" asp-action="Privacy">Chính sách bảo mật</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <h6 class="fw-bold text-warning">Liên hệ</h6>
+                        <p class="small mb-1"><i class="fa fa-map-marker-alt me-2"></i> 828 Sư Vạn Hạnh, Phường Hòa Hưng, Quận 10, TP. HCM</p>
+                        <p class="small mb-1"><i class="fa fa-phone me-2"></i> 028 3863 2052</p>
+                        <p class="small mb-2"><i class="fa fa-envelope me-2"></i> support@st.huflit.edu.vn</p>
+
+                        <div>
+                            <a href="https://www.facebook.com/huflit.edu.vn" class="me-2 text-warning"><i class="fab fa-facebook fa-lg"></i></a>
+                            <a href="https://www.instagram.com/huflit.uni/" class="me-2 text-warning"><i class="fab fa-instagram fa-lg"></i></a>
+                            <a href="https://www.tiktok.com/@@huflit.official" class="text-warning"><i class="fab fa-tiktok fa-lg"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-light opacity-50" />
+
+                <div class="text-center small">
+                    Công ty TNHH Thương Mại và Dịch Vụ Kỹ Thuật FriendShipStore - GPĐKKD: 0999999999 cấp tại Sở KH & ĐT TP. HCM. <br />
+                    Địa chỉ văn phòng: 828 Sư Vạn Hạnh, Phường Hòa Hưng, Quận 10, TP. HCM. Điện thoại: 028 3863 2052.
+                </div>
+            </div>
+        </footer>
+    }
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        // Apple-style scroll effect cho navbar
+        (function () {
+            const navbar = document.getElementById('mainNavbar');
+            let lastScroll = 0;
+
+            window.addEventListener('scroll', function () {
+                const currentScroll = window.pageYOffset;
+
+                if (currentScroll > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+
+                lastScroll = currentScroll;
+            });
+        })();
+
+        // Gợi ý tìm kiếm
+        (function () {
+            const searchBox = document.getElementById("searchBox");
+            const suggestions = document.getElementById("suggestions");
+
+            if (!searchBox) return;
+
+            searchBox.addEventListener("input", function () {
+                const keyword = this.value;
+                if (keyword.length < 2) {
+                    if (suggestions) suggestions.innerHTML = "";
+                    return;
+                }
+
+                fetch(`/Product/Suggest?keyword=${encodeURIComponent(keyword)}`)
+                    .then(res => res.text())
+                    .then(html => {
+                        if (suggestions) suggestions.innerHTML = html;
+                    })
+                    .catch(() => { /* silent */ });
+            });
+
+            document.addEventListener("click", function (e) {
+                if (suggestions && !searchBox.contains(e.target) && !suggestions.contains(e.target)) {
+                    suggestions.innerHTML = "";
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

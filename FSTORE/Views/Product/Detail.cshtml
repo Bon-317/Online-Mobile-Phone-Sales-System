@@ -1,0 +1,677 @@
+﻿@model FSTORE.Models.Product
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #ffffff;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    /* ========== MODAL OVERLAY ========== */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(10px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* ========== MODAL CONTENT ========== */
+    .modal-content {
+        background: #ffffff;
+        border-radius: 25px;
+        max-width: 1000px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        transform: scale(0.9) translateY(30px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-overlay.active .modal-content {
+        transform: scale(1) translateY(0);
+    }
+
+    /* Custom Scrollbar for Modal */
+    .modal-content::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    .modal-content::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 10px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb:hover {
+        background: #000;
+    }
+
+    /* ========== CLOSE BUTTON ========== */
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.08);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #000;
+        z-index: 10;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+        background: rgba(0, 0, 0, 0.15);
+        transform: scale(1.1);
+    }
+
+    /* ========== MODAL BODY ========== */
+    .modal-body {
+        padding: 60px 50px 50px;
+    }
+
+    /* Product Badge */
+    .product-badge {
+        display: inline-block;
+        background: #000;
+        color: #fff;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+
+    /* Product Title */
+    .modal-body h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    /* Favorite Button */
+    #favoriteBtn {
+        font-size: 1.8rem;
+        color: #86868b;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    #favoriteBtn:hover {
+        transform: scale(1.2);
+        color: #d60000;
+    }
+
+    #favoriteBtn .bi-heart-fill {
+        color: #d60000 !important;
+    }
+
+    /* Product Price */
+    .product-price-main {
+        font-size: 1.1rem;
+        color: #000;
+        margin-bottom: 20px;
+    }
+
+    .product-price-main strong {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #000;
+    }
+
+    /* Installment Info */
+    .installment-info {
+        font-size: 0.95rem;
+        color: #1d1d1f;
+        margin-bottom: 30px;
+        padding: 15px 20px;
+        background: #f5f5f7;
+        border-radius: 12px;
+    }
+
+    /* Product Grid Layout */
+    .product-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+
+    /* Carousel Section */
+    .carousel-section {
+        position: relative;
+    }
+
+    .carousel {
+        border-radius: 20px;
+        overflow: hidden;
+        background: #f5f5f7;
+    }
+
+    .carousel-item {
+        padding: 40px;
+        background:#FFFFFF;
+    }
+
+    .carousel-item img {
+        max-height: 400px;
+        height: 400px;
+        object-fit: contain;
+        margin: 0 auto;
+        display: block;
+    }
+
+    /* Carousel Controls */
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 44px;
+        height: 44px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5) !important;
+        border-radius: 50%;
+        opacity: 0.8 !important;
+        transition: all 0.3s ease;
+    }
+
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+        opacity: 1 !important;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .carousel-indicators button {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #86868b;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+    }
+
+    .carousel-indicators button.active {
+        background-color: #FFFFFF;
+        opacity: 1;
+        transform: scale(1.3);
+    }
+
+    /* Info Section */
+    .info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .stock-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f5f5f7;
+        color: #1d1d1f;
+        padding: 10px 18px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        align-self: flex-start;
+    }
+
+    .stock-badge::before {
+        content: '●';
+        color: #34c759;
+        font-size: 1.2rem;
+    }
+
+    /* Description */
+    .product-description {
+        font-size: 1rem;
+        color: #1d1d1f;
+        line-height: 1.7;
+    }
+
+    /* Add to Cart Section */
+    .cart-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: #f5f5f7;
+        border-radius: 15px;
+        margin-top: 10px;
+    }
+
+    .quantity-input {
+        width: 80px;
+        height: 44px;
+        border: 1px solid #d2d2d7;
+        border-radius: 10px;
+        padding: 0 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: center;
+        background: #fff;
+    }
+
+    .quantity-input:focus {
+        outline: none;
+        border-color: #0071e3;
+    }
+
+    .btn-add-cart {
+        flex: 1;
+        background: #0071e3;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 24px;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-add-cart:hover {
+        background: #0077ed;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+    }
+
+    .btn-add-cart:active {
+        transform: translateY(0);
+    }
+
+    /* Specifications */
+    .specs-section {
+        margin-top: 40px;
+        padding-top: 40px;
+        border-top: 1px solid #d2d2d7;
+    }
+
+    .specs-section h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 25px;
+    }
+
+    .specs-grid {
+        display: grid;
+        gap: 15px;
+    }
+
+    .spec-item {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 20px;
+        padding: 15px 20px;
+        background: #f5f5f7;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .spec-item:hover {
+        background: #e8e8ed;
+    }
+
+    .spec-label {
+        font-weight: 600;
+        color: #1d1d1f;
+        font-size: 0.95rem;
+    }
+
+    .spec-value {
+        color: #1d1d1f;
+        font-size: 0.95rem;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .modal-body {
+            padding: 50px 25px 30px;
+        }
+
+        .modal-body h2 {
+            font-size: 2rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .product-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .cart-section {
+            flex-direction: column;
+        }
+
+        .quantity-input {
+            width: 100%;
+        }
+
+        .spec-item {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .carousel-item img {
+            max-height: 300px;
+            height: 300px;
+        }
+    }
+</style>
+
+<!-- Modal Overlay -->
+<div class="modal-overlay active">
+    <div class="modal-content">
+        <!-- Close Button -->
+        <button class="modal-close" onclick="window.history.back()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+            <!-- Product Badge -->
+            <div class="product-badge">MỚI</div>
+
+            <!-- Product Title -->
+            <h2>
+                @Model.name
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <button id="favoriteBtn" onclick="toggleFavorite('@Model.ProductId')">
+                        <i class="bi bi-heart" id="heartIcon"></i>
+                    </button>
+                }
+            </h2>
+
+            <!-- Price -->
+            <div class="product-price-main">
+                <strong>@Model.price.ToString("N0") đ</strong>
+            </div>
+
+            <!-- Installment Info -->
+            @if (Model.price > 3000000)
+            {
+                var monthlyPayment = Math.Ceiling(Model.price / 24);
+                <div class="installment-info">
+                    Từ <strong>@monthlyPayment.ToString("N0")đ</strong>/tháng trong 24 tháng*
+                </div>
+            }
+
+            <!-- Product Grid -->
+            <div class="product-grid">
+                <!-- Left: Carousel -->
+                <div class="carousel-section">
+                    @if (Model.imageUrls != null && Model.imageUrls.Any())
+                    {
+                        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-indicators">
+                                @for (int i = 0; i < Model.imageUrls.Count; i++)
+                                {
+                                    <button type="button"
+                                            data-bs-target="#productCarousel"
+                                            data-bs-slide-to="@i"
+                                            class="@(i == 0 ? "active" : "")"
+                                            aria-current="@(i == 0 ? "true" : "false")"
+                                            aria-label="Slide @(i + 1)">
+                                    </button>
+                                }
+                            </div>
+
+                            <div class="carousel-inner">
+                                @for (int i = 0; i < Model.imageUrls.Count; i++)
+                                {
+                                    var img = Model.imageUrls[i];
+                                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                                        <img src="@img" class="d-block w-100"
+                                             onerror="this.onerror=null;this.src='@Url.Content("~/images/default.png")'" />
+                                    </div>
+                                }
+                            </div>
+
+                            @if (Model.imageUrls.Count > 1)
+                            {
+                                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon"></span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon"></span>
+                                </button>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="carousel">
+                            <div class="carousel-item active">
+                                <img src="@Model.imageUrl" alt="@Model.name"
+                                     onerror="this.onerror=null;this.src='@Url.Content("~/images/default.png")'" />
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Right: Info -->
+                <div class="info-section">
+                    <!-- Stock -->
+                    <div class="stock-badge">Kho còn: @Model.stock</div>
+
+                    <!-- Description -->
+                    <div class="product-description">
+                        @Model.description
+                    </div>
+
+                    <!-- Category -->
+                    <div class="product-description">
+                        <strong>Danh mục:</strong> @Model.category
+                    </div>
+
+                    <!-- Add to Cart -->
+                    <form asp-controller="Cart" asp-action="AddToCart" method="post" id="addToCartForm">
+                        <input type="hidden" name="productId" value="@Model.ProductId" />
+                        <input type="hidden" name="name" value="@Model.name" />
+                        <input type="hidden" name="price" value="@Model.price" />
+                        <input type="hidden" name="imageUrl" value="@Model.imageUrl" />
+                        <div class="cart-section">
+                            <input type="number" name="quantity" value="1" min="1" max="@Model.stock" class="quantity-input" />
+                            <button type="submit" class="btn-add-cart">
+                                <i class="bi bi-cart-plus"></i>
+                                Thêm vào giỏ hàng
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Specifications Section -->
+            <div class="specs-section">
+                <h3>Thông số kỹ thuật</h3>
+                <div class="specs-grid">
+                    @if (!string.IsNullOrEmpty(Model.chipset))
+                    {
+                        <div class="spec-item">
+                            <div class="spec-label">Chipset</div>
+                            <div class="spec-value">@Model.chipset</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ram))
+                    {
+                        <div class="spec-item">
+                            <div class="spec-label">RAM</div>
+                            <div class="spec-value">@Model.ram</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.storage))
+                    {
+                        <div class="spec-item">
+                            <div class="spec-label">Bộ nhớ trong</div>
+                            <div class="spec-value">@Model.storage</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.screenSize))
+                    {
+                        <div class="spec-item">
+                            <div class="spec-label">Kích thước màn hình</div>
+                            <div class="spec-value">@Model.screenSize</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.resolution))
+                    {
+                        <div class="spec-item">
+                            <div class="spec-label">Độ phân giải</div>
+                            <div class="spec-value">@Model.resolution</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.rearCamera))
+                    {
+                        <div class="spec-item">
+                            <div class="spec-label">Camera sau</div>
+                            <div class="spec-value">@Model.rearCamera</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.frontCamera))
+                    {
+                        <div class="spec-item">
+                            <div class="spec-label">Camera trước</div>
+                            <div class="spec-value">@Model.frontCamera</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.battery))
+                    {
+                        <div class="spec-item">
+                            <div class="spec-label">Pin</div>
+                            <div class="spec-value">@Model.battery</div>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.os))
+                    {
+                        <div class="spec-item">
+                            <div class="spec-label">Hệ điều hành</div>
+                            <div class="spec-value">@Model.os</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const productId = '@Model.ProductId';
+
+        // Kiểm tra trạng thái yêu thích khi load trang
+        $(document).ready(function () {
+            $.get('/Favorites/IsFavorite', { productId: productId }, function (response) {
+                const icon = document.getElementById("heartIcon");
+                if (response && response.isFavorite) {
+                    icon.classList.remove("bi-heart");
+                    icon.classList.add("bi-heart-fill");
+                }
+            }).fail(function () {
+                // Không làm gì nếu chưa đăng nhập hoặc lỗi
+            });
+        });
+
+        // Xử lý toggle yêu thích
+        function toggleFavorite(productId) {
+            $.ajax({
+                url: '/Favorites/Toggle',
+                type: 'POST',
+                data: { productId: productId },
+                success: function (response) {
+                    const icon = document.getElementById("heartIcon");
+                    if (response.isFavorite) {
+                        icon.classList.remove("bi-heart");
+                        icon.classList.add("bi-heart-fill");
+                    } else {
+                        icon.classList.remove("bi-heart-fill");
+                        icon.classList.add("bi-heart");
+                    }
+                },
+                error: function () {
+                    alert("Không thể thêm vào yêu thích. Vui lòng đăng nhập hoặc thử lại.");
+                }
+            });
+        }
+
+        // Close modal when clicking overlay
+        document.querySelector('.modal-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                window.history.back();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.history.back();
+            }
+        });
+
+        // Add to cart animation
+        const addToCartForm = document.getElementById('addToCartForm');
+        if (addToCartForm) {
+            addToCartForm.addEventListener('submit', function(e) {
+                const btn = this.querySelector('.btn-add-cart');
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 200);
+            });
+        }
+    </script>
+}

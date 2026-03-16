@@ -1,0 +1,80 @@
+﻿@model List<FSTORE.Models.Voucher>
+@{
+    ViewData["Title"] = "Quản lý Voucher";
+}
+
+<h1 class="mb-4">Quản lý Voucher</h1>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Tạo Voucher mới</a>
+</p>
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Mã Code</th>
+            <th>Mức giảm</th>
+            <th>Đơn tối thiểu</th>
+            <th>Ngày hết hạn</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><strong>@item.code</strong></td>
+                <td>@item.discountValue %</td>
+                <td>@item.minOrderAmount.ToString("N0") ₫</td>
+                <td>
+                    @if (item.expiryDate != null)
+                    {
+                        @item.expiryDate.ToDateTime().ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                    }
+                    else
+                    {
+                        <span class="text-muted">Không giới hạn</span>
+                    }
+                </td>
+                <td>
+                    @{
+                        string badgeClass = "bg-success";
+                        string status = "Hoạt động";
+
+                        if (!item.isActive)
+                        {
+                            badgeClass = "bg-secondary";
+                            status = "Đã khóa";
+                        }
+                        else if (item.expiryDate != null && item.expiryDate.ToDateTime() < DateTime.UtcNow)
+                        {
+                            badgeClass = "bg-danger";
+                            status = "Hết hạn";
+                        }
+                    }
+                    <span class="badge @badgeClass">@status</span>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.DocumentId" class="btn btn-sm btn-info">Sửa</a>
+                    <form asp-action="Delete" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@item.DocumentId" />
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa thật hả anh?')">Xóa</button>
+                    </form>
+                    <form asp-action="ToggleStatus" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@item.DocumentId" />
+                        @Html.AntiForgeryToken()
+                        @if (item.isActive)
+                        {
+                            <button type="submit" class="btn btn-sm btn-warning">Hủy kích hoạt</button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-sm btn-success">Kích hoạt</button>
+                        }
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

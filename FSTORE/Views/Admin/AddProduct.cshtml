@@ -1,0 +1,30 @@
+﻿@model FSTORE.Models.Product
+
+<h2>➕ Thêm sản phẩm mới cho danh mục: @Model.category</h2>
+
+<form asp-action="CreateProduct" method="post">
+    <input type="hidden" name="category" value="@Model.category" />
+
+    <div class="mb-3"><label>Tên</label><input name="name" class="form-control" /></div>
+    <div class="mb-3"><label>Giá</label><input name="price" type="number" class="form-control" /></div>
+    <div class="mb-3"><label>Kho</label><input name="stock" type="number" class="form-control" /></div>
+    <label>Ảnh chi tiết (nhiều link, cách nhau bằng dấu phẩy):</label>
+    <input type="text" name="ImageLinks" class="form-control" placeholder="https://img1.jpg, https://img2.jpg" />
+    <div class="mb-3"><label>Mô tả</label><textarea name="description" class="form-control"></textarea></div>
+
+    <hr />
+    <h4>📋 Thông số kỹ thuật</h4>
+    <div class="row">
+        <div class="col-md-4"><label>Chipset</label><input name="chipset" class="form-control" /></div>
+        <div class="col-md-4"><label>RAM</label><input name="ram" class="form-control" /></div>
+        <div class="col-md-4"><label>Bộ nhớ</label><input name="storage" class="form-control" /></div>
+        <div class="col-md-4"><label>Camera sau</label><input name="rearCamera" class="form-control" /></div>
+        <div class="col-md-4"><label>Camera trước</label><input name="frontCamera" class="form-control" /></div>
+        <div class="col-md-4"><label>Pin</label><input name="battery" class="form-control" /></div>
+        <div class="col-md-4"><label>Hệ điều hành</label><input name="os" class="form-control" /></div>
+        <div class="col-md-4"><label>Màn hình</label><input name="screenSize" class="form-control" /></div>
+        <div class="col-md-4"><label>Độ phân giải</label><input name="resolution" class="form-control" /></div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Lưu sản phẩm</button>
+</form>

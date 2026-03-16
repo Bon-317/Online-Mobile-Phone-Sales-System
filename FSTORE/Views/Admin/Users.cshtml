@@ -1,0 +1,64 @@
+﻿@model List<FSTORE.Models.User>
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+        Layout = "_AdminLayout";
+
+}
+
+<h2>👥 Quản lý người dùng</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Vai trò</th>
+            <th>Địa chỉ</th>
+            <th>Điện thoại</th>
+            <th>Ảnh</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.name</td>
+                <td>@user.email</td>
+                <td>
+                    <form asp-action="UpdateRole" method="post" class="d-flex">
+                        <input type="hidden" name="uid" value="@user.uid" />
+                        <select name="newRole" class="form-select form-select-sm w-auto me-2">
+                            <option value="user" selected="@(user.role == "user" ? "selected" : null)">Người dùng</option>
+                            <option value="staff" selected="@(user.role == "staff" ? "selected" : null)">Nhân viên</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary btn-sm">Cập nhật</button>
+                    </form>
+                </td>
+                <td>@user.address</td>
+                <td>@user.phone</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(user.imageUrl))
+                    {
+                        <img src="@user.imageUrl" width="50" height="50" style="border-radius: 50%; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">Không có ảnh</span>
+                    }
+                </td>
+                <td>
+                    <form asp-action="DeleteUser" method="post" onsubmit="return confirm('Bạn có chắc muốn xóa người dùng này?');">
+                        <input type="hidden" name="uid" value="@user.uid" />
+                        <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
